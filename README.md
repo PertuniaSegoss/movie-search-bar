@@ -3,6 +3,7 @@ Dynamic Movie Search App
 A responsive movie search application built with plain JavaScript, HTML, and CSS that fetches data from the OMDb API.
 
 Features
+
 -Live search with debounce to minimize API calls
 
 -Display movie posters, titles, year, genre, ratings, and short plot
@@ -25,4 +26,3 @@ Tech Stack
 Notes
 -This app does not stream movies.
 
-Make sure your OMDb API key is active and valid.
