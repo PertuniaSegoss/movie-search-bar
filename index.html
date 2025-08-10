@@ -3,38 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Currency Converter</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Movie Search</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h2>Currency Converter</h2>
+    <button id="mode-toggle">Dark Mode</button>
 
-    <div id="converter-card">
+    <h1>🎬 Movie Search Bar</h1>
+
+    <form id="search-form" autocomplete="off">
       <input
-        type="number"
-        id="amount"
-        placeholder="Amount"
-        min="0"
-        step="any"
+        type="text"
+        id="search-input"
+        placeholder="Start typing a movie title..."
+        required
       />
-      <br />
-      <select id="from"></select>
-      <select id="to"></select>
-      <br />
-      <button id="convertBtn">Convert</button>
+      <button type="submit" disabled>Search</button>
+    </form>
 
-      <div id="result"></div>
+    <div id="loading">
+      <div class="spinner"></div>
+    </div>
 
-      <canvas id="historyChart" width="400" height="200"></canvas>
+    <div id="error-message"></div>
 
-      <div id="loadingSpinner"></div>
+    <div id="movies"></div>
+
+    <div id="pagination">
+      <button id="prev-btn" disabled>⬅ Prev</button>
+      <button id="next-btn" disabled>Next ➡</button>
     </div>
 
     <script src="script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </body>
 </html>

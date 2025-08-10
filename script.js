@@ -1,184 +1,210 @@
-const amountInput = document.getElementById("amount");
-const fromCurrency = document.getElementById("from");
-const toCurrency = document.getElementById("to");
-const convertBtn = document.getElementById("convertBtn");
-const resultDiv = document.getElementById("result");
-const loadingSpinner = document.getElementById("loadingSpinner");
-const converterCard = document.getElementById("converter-card");
-const ctx = document.getElementById("historyChart").getContext("2d");
-let chart; // Chart.js instance
+const API_KEY = "9a668541"; // Replace with your OMDb key
+const form = document.getElementById("search-form");
+const input = document.getElementById("search-input");
+const moviesDiv = document.getElementById("movies");
+const errorMessage = document.getElementById("error-message");
+const loadingDiv = document.getElementById("loading");
+const searchBtn = form.querySelector("button");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+const modeToggleBtn = document.getElementById("mode-toggle");
 
-// Populate currencies dropdown from Frankfurter API
-async function loadCurrencies() {
-  try {
-    const res = await fetch("https://api.frankfurter.app/currencies");
-    const data = await res.json();
+let currentPage = 1;
+let currentQuery = "";
+let totalResults = 0;
+let darkMode = true; // default dark
 
-    for (const code in data) {
-      const optionFrom = document.createElement("option");
-      optionFrom.value = code;
-      optionFrom.textContent = `${code} - ${data[code]}`;
-      fromCurrency.appendChild(optionFrom);
-
-      const optionTo = optionFrom.cloneNode(true);
-      toCurrency.appendChild(optionTo);
-    }
-
-    // Set defaults
-    fromCurrency.value = "USD";
-    toCurrency.value = "EUR";
-    updateBackground();
-  } catch (err) {
-    resultDiv.textContent = "Failed to load currencies.";
-  }
+// Debounce function to limit API calls while typing
+function debounce(fn, delay) {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
 }
 
-// Show/hide spinner
-function showSpinner() {
-  loadingSpinner.style.display = "block";
-}
-function hideSpinner() {
-  loadingSpinner.style.display = "none";
-}
-
-// Update dynamic background color by fromCurrency
-function updateBackground() {
-  const from = fromCurrency.value;
-  converterCard.className = ""; // reset
-  converterCard.classList.add("bg-" + from);
-}
-
-// Convert currency using Frankfurter API
-async function convertCurrency() {
-  const amount = parseFloat(amountInput.value);
-  const from = fromCurrency.value;
-  const to = toCurrency.value;
-
-  if (isNaN(amount) || amount <= 0) {
-    alert("Please enter a valid amount.");
-    return;
-  }
-  if (from === to) {
-    alert("Please select two different currencies.");
-    return;
-  }
-
-  showSpinner();
-  resultDiv.textContent = "";
-
-  try {
-    const res = await fetch(
-      `https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`
-    );
-    if (!res.ok) throw new Error("API error");
-    const data = await res.json();
-    const converted = data.rates[to];
-
-    resultDiv.textContent = `${amount} ${from} = ${converted.toFixed(4)} ${to}`;
-    fetchHistory(from, to);
-  } catch (err) {
-    resultDiv.textContent = "Conversion failed, please try again.";
-    clearChart();
-  } finally {
-    hideSpinner();
-  }
-}
-
-// Fetch 7-day historical exchange rates and display chart
-async function fetchHistory(from, to) {
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(endDate.getDate() - 7);
-
-  const formatDate = (d) => d.toISOString().split("T")[0];
-
-  showSpinner();
-
-  try {
-    const res = await fetch(
-      `https://api.frankfurter.app/${formatDate(startDate)}..${formatDate(
-        endDate
-      )}?from=${from}&to=${to}`
-    );
-    if (!res.ok) throw new Error("History API error");
-    const data = await res.json();
-
-    const labels = [];
-    const rates = [];
-
-    // Sort dates to be chronological
-    const sortedDates = Object.keys(data.rates).sort();
-
-    sortedDates.forEach((date) => {
-      labels.push(date);
-      rates.push(data.rates[date][to]);
-    });
-
-    renderChart(labels, rates, from, to);
-  } catch (err) {
-    clearChart();
-  } finally {
-    hideSpinner();
-  }
-}
-
-// Render Chart.js line chart
-function renderChart(labels, dataPoints, from, to) {
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: `Exchange Rate: 1 ${from} to ${to}`,
-          data: dataPoints,
-          fill: true,
-          backgroundColor: "rgba(255,77,136,0.2)",
-          borderColor: "#ff4d88",
-          borderWidth: 3,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          tension: 0.3,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      animation: { duration: 600 },
-      scales: {
-        y: {
-          beginAtZero: false,
-          ticks: { color: "#ff4d88" },
-          grid: { color: "#ffd0de" },
-        },
-        x: {
-          ticks: { color: "#ff4d88" },
-          grid: { color: "#ffd0de" },
-        },
-      },
-      plugins: {
-        legend: { labels: { color: "#ff4d88", font: { weight: "bold" } } },
-      },
-    },
-  });
-}
-
-// Clear chart
-function clearChart() {
-  if (chart) {
-    chart.destroy();
-    chart = null;
-  }
-}
-
-// Event listeners
-fromCurrency.addEventListener("change", () => {
-  updateBackground();
+// Enable/disable search button based on input
+input.addEventListener("input", () => {
+  searchBtn.disabled = input.value.trim().length === 0;
+  debouncedSearch(input.value.trim());
 });
 
-convertBtn.addEventListener("click", convertCurrency);
+// Debounced live search (500ms after typing stops)
+const debouncedSearch = debounce((query) => {
+  if (query.length > 0) {
+    currentPage = 1;
+    performSearch(query, currentPage);
+  } else {
+    clearResults();
+  }
+});
 
-// Initialize
-loadCurrencies();
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (input.value.trim() === "") return;
+  currentPage = 1;
+  performSearch(input.value.trim(), currentPage);
+});
+
+prevBtn.addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    performSearch(currentQuery, currentPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+
+nextBtn.addEventListener("click", () => {
+  if (currentPage * 10 < totalResults) {
+    currentPage++;
+    performSearch(currentQuery, currentPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+
+modeToggleBtn.addEventListener("click", () => {
+  darkMode = !darkMode;
+  if (darkMode) {
+    document.body.classList.remove("light-mode");
+    modeToggleBtn.textContent = "Dark Mode";
+  } else {
+    document.body.classList.add("light-mode");
+    modeToggleBtn.textContent = "Light Mode";
+  }
+});
+
+// Clear previous results
+function clearResults() {
+  moviesDiv.innerHTML = "";
+  errorMessage.textContent = "";
+  loadingDiv.style.display = "none";
+  prevBtn.disabled = true;
+  nextBtn.disabled = true;
+}
+
+// Show loading spinner
+function showLoading(show) {
+  loadingDiv.style.display = show ? "block" : "none";
+}
+
+async function performSearch(query, page) {
+  currentQuery = query;
+  errorMessage.textContent = "";
+  moviesDiv.innerHTML = "";
+  showLoading(true);
+  searchBtn.disabled = true;
+  prevBtn.disabled = true;
+  nextBtn.disabled = true;
+
+  try {
+    const res = await fetch(
+      `https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(
+        query
+      )}&page=${page}`
+    );
+    const data = await res.json();
+
+    if (data.Response === "False") {
+      errorMessage.textContent = data.Error;
+      showLoading(false);
+      searchBtn.disabled = false;
+      return;
+    }
+
+    totalResults = parseInt(data.totalResults);
+    // Fetch full details for each movie for plot etc
+    const detailsPromises = data.Search.map((movie) =>
+      fetch(
+        `https://www.omdbapi.com/?apikey=${API_KEY}&i=${movie.imdbID}&plot=short`
+      ).then((res) => res.json())
+    );
+    const moviesDetails = await Promise.all(detailsPromises);
+
+    moviesDiv.innerHTML = "";
+    moviesDetails.forEach((movie) => {
+      const movieEl = document.createElement("div");
+      movieEl.classList.add("movie");
+      movieEl.innerHTML = `
+        <img src="${
+          movie.Poster !== "N/A"
+            ? movie.Poster
+            : "https://via.placeholder.com/220x320?text=No+Image"
+        }" alt="${movie.Title}" />
+        <div class="movie-info">
+          <h3>${movie.Title}</h3>
+          <span>${movie.Year} | ${movie.Genre || "Genre N/A"}</span>
+          <p>${movie.Plot !== "N/A" ? movie.Plot : "Plot not available."}</p>
+          <span>IMDb Rating: ${
+            movie.imdbRating !== "N/A" ? movie.imdbRating : "N/A"
+          }</span>
+        </div>
+        <div class="expanded-details">
+          <p><strong>Director:</strong> ${movie.Director || "N/A"}</p>
+          <p><strong>Actors:</strong> ${movie.Actors || "N/A"}</p>
+          <p><strong>Runtime:</strong> ${movie.Runtime || "N/A"}</p>
+          <p><strong>Language:</strong> ${movie.Language || "N/A"}</p>
+          <p><strong>Country:</strong> ${movie.Country || "N/A"}</p>
+        </div>
+      `;
+      moviesDiv.appendChild(movieEl);
+
+      // Expand details toggle on click
+      movieEl.addEventListener("click", () => {
+        movieEl.classList.toggle("expanded");
+      });
+    });
+
+    // Enable/disable pagination buttons
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage * 10 >= totalResults;
+  } catch (err) {
+    console.error(err);
+    errorMessage.textContent = "Something went wrong. Please try again.";
+  } finally {
+    showLoading(false);
+    searchBtn.disabled = false;
+  }
+}
+
+// On page load disable search button since input is empty
+searchBtn.disabled = true;
+
+moviesDetails.forEach((movie) => {
+  const movieEl = document.createElement("div");
+  movieEl.classList.add("movie");
+  movieEl.innerHTML = `
+    <img src="${
+      movie.Poster !== "N/A"
+        ? movie.Poster
+        : "https://via.placeholder.com/220x320?text=No+Image"
+    }" alt="${movie.Title}" />
+    <div class="movie-info">
+      <h3>${movie.Title}</h3>
+      <span>${movie.Year} | ${movie.Genre || "Genre N/A"}</span>
+      <p>${movie.Plot !== "N/A" ? movie.Plot : "Plot not available."}</p>
+      <span>IMDb Rating: ${
+        movie.imdbRating !== "N/A" ? movie.imdbRating : "N/A"
+      }</span>
+      <button class="trailer-btn" type="button">Watch Trailer</button>
+    </div>
+    <div class="expanded-details">
+      <p><strong>Director:</strong> ${movie.Director || "N/A"}</p>
+      <p><strong>Actors:</strong> ${movie.Actors || "N/A"}</p>
+      <p><strong>Runtime:</strong> ${movie.Runtime || "N/A"}</p>
+      <p><strong>Language:</strong> ${movie.Language || "N/A"}</p>
+      <p><strong>Country:</strong> ${movie.Country || "N/A"}</p>
+    </div>
+  `;
+
+  moviesDiv.appendChild(movieEl);
+
+  // Expand details toggle on click (but not on trailer button)
+  movieEl.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("trailer-btn")) {
+      movieEl.classList.toggle("expanded");
+    }
+  });
+
+  

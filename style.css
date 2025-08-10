@@ -1,122 +1,155 @@
 * {
   box-sizing: border-box;
-  transition: background-color 0.4s ease, color 0.4s ease;
 }
-
 body {
-  font-family: "Poppins", sans-serif;
-  background: #f0f4f8;
-  margin: 40px auto;
-  max-width: 460px;
-  padding: 0 20px;
-  color: #222;
-  user-select: none;
-  text-align: center;
-}
-
-h2 {
-  font-weight: 700;
-  margin-bottom: 25px;
-  color: #ff4d88;
-  text-shadow: 0 1px 5px rgba(255, 77, 136, 0.5);
-}
-
-#converter-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(255, 77, 136, 0.15);
-  padding: 30px 25px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #121212;
+  color: #eee;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
   position: relative;
-  display: inline-block;
-  min-width: 320px;
 }
-
-.bg-USD {
-  background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
-  color: white;
-}
-.bg-EUR {
-  background: linear-gradient(135deg, #ff6f91 0%, #ff9671 100%);
-  color: white;
-}
-.bg-GBP {
-  background: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
-  color: white;
-}
-
-input[type="number"],
-select {
-  width: 120px;
-  padding: 12px 14px;
-  margin: 10px 8px 20px 8px;
-  border-radius: 15px;
-  border: 2px solid #eee;
-  font-size: 1.1rem;
-  font-weight: 600;
-  outline-offset: 3px;
-  outline-color: transparent;
-  cursor: pointer;
-  box-shadow: inset 0 0 8px #fce4ec;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-input[type="number"]:focus,
-select:focus {
-  outline-color: #ff4d88;
-  border-color: #ff4d88;
-  box-shadow: 0 0 15px #ff4d88;
-}
-
-button {
-  background: #ff4d88;
-  color: white;
-  border: none;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 14px 25px;
-  border-radius: 30px;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(255, 77, 136, 0.5);
-  transition: transform 0.3s ease, background-color 0.3s ease,
-    box-shadow 0.3s ease;
+h1 {
+  margin-bottom: 20px;
+  color: rgb(95, 203, 236);
   user-select: none;
 }
-
-button:hover {
-  background: #e6366f;
+form {
+  margin-bottom: 20px;
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+}
+input[type="text"] {
+  padding: 12px 16px;
+  font-size: 18px;
+  flex-grow: 1;
+  border-radius: 6px 0 0 6px;
+  border: none;
+  outline: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background: #222;
+  color: #eee;
+}
+input[type="text"]:focus {
+  background: #333;
+}
+button {
+  padding: 12px 20px;
+  font-size: 18px;
+  border: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  border-radius: 0 6px 6px 0;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+button:hover:not(:disabled) {
+  background-color: #e63900;
+}
+button:disabled {
+  background-color: #ff9966;
+  cursor: not-allowed;
+}
+#movies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px;
+}
+.movie {
+  background: #222;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 60, 0, 0.5);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease,
+    background-color 0.3s ease;
+  position: relative;
+  color: #eee;
+}
+.movie:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(230, 54, 111, 0.7);
+  box-shadow: 0 0 20px rgba(255, 60, 0, 0.8);
+  z-index: 10;
 }
-
-/* Result */
-#result {
-  margin-top: 30px;
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  min-height: 38px;
-  color: #ff4d88;
-  text-shadow: 0 1px 3px rgba(255, 77, 136, 0.7);
+.movie img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
-
-/* Chart */
-canvas {
-  margin-top: 40px;
-  border-radius: 15px;
-  box-shadow: 0 10px 35px rgba(255, 77, 136, 0.15);
+.movie-info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+  user-select: none;
 }
-
-#loadingSpinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #ff4d88;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  animation: spin 1s linear infinite;
-  margin: 30px auto 0;
+.movie-info h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #fc52c3;
+  user-select: text;
+}
+.movie-info span {
+  font-weight: 600;
+  font-size: 14px;
+  color: #bbb;
+  user-select: text;
+}
+.movie-info p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #ddd;
+  user-select: text;
+}
+.expanded-details {
+  background: #1a1a1a;
+  padding: 10px 15px;
+  border-top: 1px solid #ff3c00;
+  font-size: 14px;
+  color: #ccc;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, background-color 0.3s ease, color 0.3s ease;
+}
+.movie.expanded .expanded-details {
+  max-height: 200px;
+  margin-top: 10px;
+}
+#error-message {
+  color: #ff3c00;
+  margin-top: 20px;
+  font-weight: bold;
+  user-select: none;
+}
+#loading {
+  margin: 30px 0;
   display: none;
+  user-select: none;
 }
-
+/* Spinner */
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #ff3c00;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -125,14 +158,130 @@ canvas {
     transform: rotate(360deg);
   }
 }
+/* Pagination */
+#pagination {
+  margin: 30px 0;
+  display: flex;
+  gap: 12px;
+  user-select: none;
+}
+#pagination button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #ff3c00;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#pagination button:disabled {
+  background-color: #ff9966;
+  cursor: not-allowed;
+}
+#pagination button:hover:not(:disabled) {
+  background-color: #e63900;
+}
 
-@media (max-width: 480px) {
-  input[type="number"],
-  select {
-    width: 100%;
-    margin: 10px 0 20px 0;
-  }
-  button {
-    width: 100%;
-  }
+/* Dark/Light mode toggle button */
+#mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ff3c00;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+  z-index: 1000;
+}
+#mode-toggle:hover {
+  background-color: #e63900;
+}
+
+/* Light mode styles */
+body.light-mode {
+  background: #f9f9f9;
+  color: #222;
+}
+body.light-mode h1 {
+  color: #d14400;
+}
+body.light-mode input[type="text"] {
+  background: #eee;
+  color: #222;
+}
+body.light-mode input[type="text"]:focus {
+  background: #ddd;
+}
+body.light-mode button {
+  background-color: #d14400;
+  color: white;
+}
+body.light-mode button:hover:not(:disabled) {
+  background-color: #b33200;
+}
+body.light-mode button:disabled {
+  background-color: #f5a17c;
+  cursor: not-allowed;
+}
+body.light-mode .movie {
+  background: #fff;
+  color: #222;
+  box-shadow: 0 0 12px rgba(209, 68, 0, 0.5);
+}
+body.light-mode .movie:hover {
+  box-shadow: 0 0 20px rgba(209, 68, 0, 0.8);
+}
+body.light-mode .movie-info h3 {
+  color: #d14400;
+}
+body.light-mode .movie-info span {
+  color: #555;
+}
+body.light-mode .movie-info p {
+  color: #444;
+}
+body.light-mode .expanded-details {
+  background: #f2f2f2;
+  border-top: 1px solid #d14400;
+  color: #555;
+}
+body.light-mode #error-message {
+  color: #d14400;
+}
+body.light-mode #loading .spinner {
+  border: 6px solid #ddd;
+  border-top: 6px solid #d14400;
+}
+body.light-mode #pagination button {
+  background-color: #d14400;
+  color: white;
+}
+body.light-mode #pagination button:disabled {
+  background-color: #f5a17c;
+}
+body.light-mode #pagination button:hover:not(:disabled) {
+  background-color: #b33200;
+}
+.trailer-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #ff3c00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  user-select: none;
+  width: fit-content;
+}
+.trailer-btn:hover {
+  background-color: #e63900;
 }
