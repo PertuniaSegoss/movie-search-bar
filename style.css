@@ -1,0 +1,138 @@
+* {
+  box-sizing: border-box;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: #f0f4f8;
+  margin: 40px auto;
+  max-width: 460px;
+  padding: 0 20px;
+  color: #222;
+  user-select: none;
+  text-align: center;
+}
+
+h2 {
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #ff4d88;
+  text-shadow: 0 1px 5px rgba(255, 77, 136, 0.5);
+}
+
+#converter-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(255, 77, 136, 0.15);
+  padding: 30px 25px;
+  position: relative;
+  display: inline-block;
+  min-width: 320px;
+}
+
+.bg-USD {
+  background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+  color: white;
+}
+.bg-EUR {
+  background: linear-gradient(135deg, #ff6f91 0%, #ff9671 100%);
+  color: white;
+}
+.bg-GBP {
+  background: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
+  color: white;
+}
+
+input[type="number"],
+select {
+  width: 120px;
+  padding: 12px 14px;
+  margin: 10px 8px 20px 8px;
+  border-radius: 15px;
+  border: 2px solid #eee;
+  font-size: 1.1rem;
+  font-weight: 600;
+  outline-offset: 3px;
+  outline-color: transparent;
+  cursor: pointer;
+  box-shadow: inset 0 0 8px #fce4ec;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="number"]:focus,
+select:focus {
+  outline-color: #ff4d88;
+  border-color: #ff4d88;
+  box-shadow: 0 0 15px #ff4d88;
+}
+
+button {
+  background: #ff4d88;
+  color: white;
+  border: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 14px 25px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255, 77, 136, 0.5);
+  transition: transform 0.3s ease, background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  user-select: none;
+}
+
+button:hover {
+  background: #e6366f;
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(230, 54, 111, 0.7);
+}
+
+/* Result */
+#result {
+  margin-top: 30px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  min-height: 38px;
+  color: #ff4d88;
+  text-shadow: 0 1px 3px rgba(255, 77, 136, 0.7);
+}
+
+/* Chart */
+canvas {
+  margin-top: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 35px rgba(255, 77, 136, 0.15);
+}
+
+#loadingSpinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ff4d88;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  animation: spin 1s linear infinite;
+  margin: 30px auto 0;
+  display: none;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  input[type="number"],
+  select {
+    width: 100%;
+    margin: 10px 0 20px 0;
+  }
+  button {
+    width: 100%;
+  }
+}
